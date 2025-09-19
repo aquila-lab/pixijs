@@ -1,17 +1,13 @@
 {
-  "name": "pixi.js",
+  "name": "@wonder-design/pixijs",
   "version": "8.13.2",
   "author": "PixiJS Team",
-  "homepage": "http://pixijs.com/",
-  "bugs": "https://github.com/pixijs/pixijs/issues",
+  "homepage": "https://github.com/aquila-lab/pixijs#readme",
+  "bugs": "https://github.com/aquila-lab/pixijs/issues",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pixijs/pixijs.git"
-  },
-  "funding": {
-    "type": "opencollective",
-    "url": "https://opencollective.com/pixijs"
+    "url": "https://github.com/aquila-lab/pixijs.git"
   },
   "main": "lib/index.js",
   "module": "lib/index.mjs",

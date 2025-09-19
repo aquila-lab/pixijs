@@ -34,6 +34,7 @@ coverage.lcov
 dist
 lib
 out
+*.tgz
 
 # jetBrains IDE ignores
 .idea

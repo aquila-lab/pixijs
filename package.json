@@ -1,7 +1,7 @@
 {
   "name": "@wonder-design/pixijs",
-  "version": "8.13.2",
-  "author": "PixiJS Team",
+  "version": "8.15.0",
+  "author": "Wonder & PixiJS Team",
   "homepage": "https://github.com/aquila-lab/pixijs#readme",
   "bugs": "https://github.com/aquila-lab/pixijs/issues",
   "license": "MIT",
@@ -14,7 +14,8 @@
   "types": "lib/index.d.ts",
   "files": [
     "lib",
-    "dist"
+    "dist",
+    "transcoders"
   ],
   "scripts": {
     "prepare": "husky install",
@@ -45,7 +46,7 @@
     "test:index": "ts-node --transpile-only ./scripts/index/index.ts --check",
     "docs": "mkdirp out && npx typedoc",
     "docs:watch": "nodemon --watch \"./src/*\" --exec \"rimraf .s3_uploads/docs && npm run docs\" -e ts,md",
-    "lint": "eslint ./ --cache --max-warnings 0",
+    "lint": "eslint ./ --cache --max-warnings 0 --no-warn-ignored",
     "lint:fix": "npm run lint -- --fix",
     "stackblitz-ci": "run-s build",
     "prerelease": "run-s clean:build test dist",

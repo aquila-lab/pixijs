@@ -416,6 +416,7 @@ export abstract class Batcher
         }
 
         this.batchIndex = 0;
+
         this._batchIndexStart = 0;
         this._batchIndexSize = 0;
 
@@ -774,16 +775,29 @@ export abstract class Batcher
         }
     }
 
-    public destroy()
+    /**
+     * Destroys the batch and its resources.
+     * @param options - destruction options
+     * @param options.shader - whether to destroy the associated shader
+     */
+    public destroy(options: {shader?: boolean} = {})
     {
         if (this.batches === null) return;
 
-        for (let i = 0; i < this.batches.length; i++)
+        for (let i = 0; i < this.batchIndex; i++)
         {
             returnBatchToPool(this.batches[i]);
         }
 
         this.batches = null;
+        this.geometry.destroy(true);
+        this.geometry = null;
+
+        if (options.shader)
+        {
+            this.shader?.destroy();
+            this.shader = null;
+        }
 
         for (let i = 0; i < this._elements.length; i++)
         {

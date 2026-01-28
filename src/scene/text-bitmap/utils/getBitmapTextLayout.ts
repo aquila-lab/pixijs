@@ -224,6 +224,10 @@ export function getBitmapTextLayout(
 
     nextLine();
 
+    // Ensure minimum height based on font metrics for proper hit testing.
+    // lineHeight controls line spacing, but bounds should always include actual text height.
+    layoutData.height = Math.max(layoutData.height, font.lineHeight);
+
     if (style.align === 'center')
     {
         alignCenter(layoutData);

@@ -756,7 +756,7 @@ export class TextStyle extends EventEmitter<{
         fontWeight: 'normal',
         leading: 0,
         letterSpacing: 0,
-        lineHeight: 0,
+        lineHeight: undefined,
         padding: 0,
         stroke: null,
         textBaseline: 'alphabetic',

@@ -303,7 +303,7 @@ export class CanvasTextMetrics
             width += style.dropShadow.distance;
         }
 
-        const lineHeight = style.lineHeight || fontProperties.fontSize;
+        const lineHeight = style.lineHeight !== undefined ? style.lineHeight : fontProperties.fontSize;
 
         let height = Math.max(lineHeight, fontProperties.fontSize + (strokeWidth))
             + ((lines.length - 1) * (lineHeight + style.leading));

@@ -73,7 +73,7 @@ export function getBitmapTextLayout(
 
     const adjustedLetterSpacing = style.letterSpacing * scale;
     const adjustedWordWrapWidth = style.wordWrapWidth * scale;
-    const adjustedLineHeight = style.lineHeight ? style.lineHeight * scale : font.lineHeight;
+    const adjustedLineHeight = style.lineHeight !== undefined ? style.lineHeight * scale : font.lineHeight;
 
     const breakWords = style.wordWrap && style.breakWords;
 

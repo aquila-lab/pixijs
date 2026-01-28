@@ -141,7 +141,7 @@ export class BitmapTextPipe implements RenderPipe<BitmapText>
 
         let lineHeight = bitmapFont.lineHeight;
 
-        if (style.lineHeight)
+        if (style.lineHeight !== undefined)
         {
             lineHeight = style.lineHeight / scale;
         }

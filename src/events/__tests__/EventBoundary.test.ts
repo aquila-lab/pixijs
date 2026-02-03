@@ -160,6 +160,9 @@ describe('EventBoundary', () =>
         const boundary = new EventBoundary(stage);
         const container = stage.addChild(new Container());
 
+        // Add a child with visual content to give the container bounds
+        container.addChild(graphicsWithRect(0, 0, 100, 100));
+
         container.eventMode = 'static';
         container.interactiveChildren = false;
 

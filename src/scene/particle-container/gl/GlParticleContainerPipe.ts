@@ -1,6 +1,6 @@
 import { ExtensionType } from '../../../extensions/Extensions';
 import { GlParticleContainerAdaptor } from '../gl/GlParticleContainerAdaptor';
-import { ParticleContainerPipe } from './ParticleContainerPipe';
+import { ParticleContainerPipe } from '../shared/ParticleContainerPipe';
 
 import type { WebGLRenderer } from '../../../rendering/renderers/gl/WebGLRenderer';
 
@@ -12,7 +12,7 @@ import type { WebGLRenderer } from '../../../rendering/renderers/gl/WebGLRendere
 export class GlParticleContainerPipe extends ParticleContainerPipe
 {
     /** @ignore */
-    public static extension = {
+    public static extension: { type: ExtensionType[]; name: 'particle' } = {
         type: [
             ExtensionType.WebGLPipes,
         ],

@@ -100,6 +100,7 @@ export class GCSystem implements System<GCSystemOptions>
         type: [
             ExtensionType.WebGLSystem,
             ExtensionType.WebGPUSystem,
+            ExtensionType.CanvasSystem,
         ],
         name: 'gc',
         priority: 0,
@@ -542,4 +543,3 @@ export class GCSystem implements System<GCSystemOptions>
         this._renderer = null as any as Renderer;
     }
 }
-

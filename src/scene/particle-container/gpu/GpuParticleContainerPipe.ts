@@ -1,6 +1,6 @@
 import { ExtensionType } from '../../../extensions/Extensions';
 import { GpuParticleContainerAdaptor } from '../gpu/GpuParticleContainerAdaptor';
-import { ParticleContainerPipe } from './ParticleContainerPipe';
+import { ParticleContainerPipe } from '../shared/ParticleContainerPipe';
 
 import type { WebGPURenderer } from '../../../rendering/renderers/gpu/WebGPURenderer';
 
@@ -12,7 +12,7 @@ import type { WebGPURenderer } from '../../../rendering/renderers/gpu/WebGPURend
 export class GpuParticleContainerPipe extends ParticleContainerPipe
 {
     /** @ignore */
-    public static extension = {
+    public static extension: { type: ExtensionType[]; name: 'particle' } = {
         type: [
             ExtensionType.WebGPUPipes,
         ],

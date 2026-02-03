@@ -594,7 +594,7 @@ export interface TextStyleOptions
     letterSpacing?: number;
     /** The line height, a number that represents the vertical space that a letter uses */
     /** @default null */
-    lineHeight?: number;
+    lineHeight?: number | null;
     /**
      * Padding around the text.
      *

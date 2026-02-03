@@ -26,7 +26,7 @@ export function textStyleToCSS(style: HTMLTextStyle): string
         `text-align: ${style.align}`,
         `padding: ${style.padding}px`,
         `white-space: ${(style.whiteSpace === 'pre' && style.wordWrap) ? 'pre-wrap' : style.whiteSpace}`,
-        ...style.lineHeight !== undefined ? [`line-height: ${style.lineHeight}px`] : [],
+        ...(style.lineHeight !== null && style.lineHeight !== undefined) ? [`line-height: ${style.lineHeight}px`] : [],
         ...style.wordWrap ? [
             `word-wrap: ${style.breakWords ? 'break-all' : 'break-word'}`,
             `max-width: ${style.wordWrapWidth}px`

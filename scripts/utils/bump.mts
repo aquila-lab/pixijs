@@ -1,12 +1,7 @@
-import inquirer from 'inquirer';
 import semver from 'semver';
+import { confirm, input, select } from '@inquirer/prompts';
 
-interface BumpAnswers
-{
-    bump: 'major' | 'minor' | 'patch' | 'custom';
-    custom: string;
-    confirmed: boolean;
-}
+type BumpType = 'major' | 'minor' | 'patch' | 'prerelease' | 'custom';
 
 /**
  * Ask the user to do a version bump.
@@ -15,9 +10,7 @@ interface BumpAnswers
  */
 export const bump = async (currentVersion: string): Promise<string> =>
 {
-    const { bump, custom, confirmed } = await inquirer.prompt<BumpAnswers>([{
-        name: 'bump',
-        type: 'list',
+    const bumpType = await select<BumpType>({
         message: `Release version (currently v${currentVersion}):`,
         choices: [
             { value: 'prerelease', name: `Prerelease (v${semver.inc(currentVersion, 'prerelease')})` },
@@ -26,29 +19,32 @@ export const bump = async (currentVersion: string): Promise<string> =>
             { value: 'major', name: `Major (v${semver.inc(currentVersion, 'major')})` },
             { value: 'custom', name: `Custom version` },
         ],
-    }, {
-        name: 'custom',
-        type: 'input',
-        message: 'What version? (e.g., 1.0.0)',
-        when: (answers) => answers.bump === 'custom',
-    }, {
-        name: 'confirmed',
-        type: 'confirm',
-        default: false,
-        message: ({ bump, custom }) =>
-        {
-            const nextVersion = bump === 'custom' ? custom : semver.inc(currentVersion, bump);
+    });
 
-            return `Are you sure you want to release v${nextVersion}?`;
-        },
-    }]);
+    let nextVersion: string | null;
+
+    if (bumpType === 'custom')
+    {
+        const custom = await input({
+            message: 'What version? (e.g., 1.0.0)',
+        });
+
+        nextVersion = custom;
+    }
+    else
+    {
+        nextVersion = semver.inc(currentVersion, bumpType);
+    }
+
+    const confirmed = await confirm({
+        message: `Are you sure you want to release v${nextVersion}?`,
+        default: false,
+    });
 
     if (!confirmed)
     {
         throw new Error(`Version bump cancelled.`);
     }
-
-    const nextVersion = bump === 'custom' ? custom : semver.inc(currentVersion, bump);
 
     // Make sure the version is valid
     if (nextVersion === null || semver.valid(nextVersion) === null)

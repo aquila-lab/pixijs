@@ -593,6 +593,7 @@ export interface TextStyleOptions
     /** The amount of spacing between letters, default is 0 */
     letterSpacing?: number;
     /** The line height, a number that represents the vertical space that a letter uses */
+    /** @default null */
     lineHeight?: number;
     /**
      * Padding around the text.
@@ -785,7 +786,7 @@ export class TextStyle extends EventEmitter<{
         fontWeight: 'normal',
         leading: 0,
         letterSpacing: 0,
-        lineHeight: undefined,
+        lineHeight: null,
         padding: 0,
         stroke: null,
         textBaseline: 'alphabetic',

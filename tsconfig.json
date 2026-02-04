@@ -23,6 +23,7 @@
             "~/*": ["./src/*"],
             "@test-utils": ["./tests/utils/index.ts"]
         },
+        "rewriteRelativeImportExtensions": true
     },
     "exclude": [
         "node_modules",

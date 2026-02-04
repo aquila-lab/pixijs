@@ -31,4 +31,3 @@ export const gpuUploadBufferImageResource = {
         );
     }
 } as GpuTextureUploader<BufferImageSource>;
-

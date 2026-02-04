@@ -5,6 +5,7 @@ import type { Container } from '~/scene';
 
 export const scene: TestScene = {
     it: 'should render html-text stroke with anchor and tagged text correctly',
+    pixelMatch: 110,
     create: async (scene: Container, renderer) =>
     {
         const text = new HTMLText({

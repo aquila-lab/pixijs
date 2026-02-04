@@ -136,6 +136,16 @@ export function getBitmapTextLayout(
     const checkIsOverflow = (lineWidth: number) =>
         lineWidth - adjustedLetterSpacing > adjustedWordWrapWidth;
 
+    // Characters that allow breaking AFTER them (like CSS line-break opportunities)
+    // These characters stay with the current word, then we can wrap to a new line
+    // Used when wordWrap is enabled to provide CSS break-word behavior
+    const isBreakAfterChar = (c: string) =>
+        c === '-' // hyphen
+        || c === '\u2010' // hyphen (Unicode)
+        || c === '\u2013' // en-dash
+        || c === '\u2014' // em-dash
+        || c === '\u00AD'; // soft hyphen
+
     // loop an extra time to force a line break..
     for (let i = 0; i < chars.length + 1; i++)
     {
@@ -151,12 +161,29 @@ export function getBitmapTextLayout(
         const charData = font.chars[char] || font.chars[' '];
 
         const isSpace = (/(?:\s)/).test(char);
-        const isWordBreak = isSpace || char === '\r' || char === '\n' || isEnd;
+        const isNewline = char === '\r' || char === '\n';
+        // Break-after chars (hyphen, dot, slash) - char stays with word, then we can break
+        // Only applies when breakWords is FALSE (CSS break-word behavior)
+        // When breakWords is TRUE (CSS break-all), we break at any character instead
+        const isBreakAfter = !isEnd && style.wordWrap && !breakWords && isBreakAfterChar(char);
+        // Traditional word breaks (spaces, newlines, end)
+        const isWordBreak = isSpace || isNewline || isEnd;
 
-        // spaceCount++;
-        // wasSpace = isSpace;
+        // For break-after chars, add to word first, then treat as word break
+        if (isBreakAfter)
+        {
+            const kerning = charData.kerning[previousChar] || 0;
+            const nextCharWidth = charData.xAdvance + kerning + adjustedLetterSpacing;
 
-        if (isWordBreak)
+            currentWord.positions[currentWord.index++] = currentWord.width + kerning;
+            currentWord.chars.push(char);
+            currentWord.width += nextCharWidth;
+
+            previousChar = char;
+        }
+
+        // Handle word breaks (spaces, newlines, end, or after break-after chars)
+        if (isWordBreak || isBreakAfter)
         {
             const addWordToNextLine = !firstWord && style.wordWrap && checkIsOverflow(currentLine.width + currentWord.width);
 
@@ -166,7 +193,7 @@ export function getBitmapTextLayout(
 
                 nextWord(currentWord);
 
-                if (!isEnd)
+                if (!isEnd && !isBreakAfter)
                 {
                     currentLine.charPositions.push(0);
                 }
@@ -177,17 +204,17 @@ export function getBitmapTextLayout(
 
                 nextWord(currentWord);
 
-                if (!isEnd)
+                if (!isEnd && !isBreakAfter)
                 {
                     currentLine.charPositions.push(0);
                 }
             }
 
-            if (char === '\r' || char === '\n')
+            if (isNewline)
             {
                 nextLine();
             }
-            else if (!isEnd)
+            else if (isSpace && !isEnd)
             {
                 const spaceWidth = charData.xAdvance + (charData.kerning[previousChar] || 0) + adjustedLetterSpacing;
 
@@ -196,32 +223,58 @@ export function getBitmapTextLayout(
                 currentLine.spaceWidth = spaceWidth;
                 currentLine.spacesIndex.push(currentLine.charPositions.length);
                 currentLine.chars.push(char);
+            }
 
-                // spaceCount++;
+            if (!isBreakAfter)
+            {
+                previousChar = char;
             }
         }
         else
         {
+            // Regular character - add to current word
             const kerning = charData.kerning[previousChar] || 0;
-
             const nextCharWidth = charData.xAdvance + kerning + adjustedLetterSpacing;
 
-            const addWordToNextLine = breakWords && checkIsOverflow(currentLine.width + currentWord.width + nextCharWidth);
-
-            if (addWordToNextLine)
+            if (style.wordWrap && currentWord.index > 0)
             {
-                nextWord(currentWord);
-                nextLine();
+                if (breakWords)
+                {
+                    // breakWords: true = CSS break-all
+                    // Break when line + word + char would overflow
+                    const wouldOverflow = checkIsOverflow(currentLine.width + currentWord.width + nextCharWidth);
+
+                    if (wouldOverflow)
+                    {
+                        nextWord(currentWord);
+                        nextLine();
+                    }
+                }
+                else
+                {
+                    // breakWords: false = CSS break-word
+                    // Break as last resort when word ALONE is too long (no break-after chars helped)
+                    const wordAloneTooLong = checkIsOverflow(currentWord.width + nextCharWidth);
+
+                    if (wordAloneTooLong)
+                    {
+                        // Word is genuinely too long for any line, break it
+                        if (checkIsOverflow(currentLine.width + currentWord.width))
+                        {
+                            nextLine();
+                        }
+                        nextWord(currentWord);
+                        nextLine();
+                    }
+                }
             }
 
             currentWord.positions[currentWord.index++] = currentWord.width + kerning;
             currentWord.chars.push(char);
-
             currentWord.width += nextCharWidth;
-        }
 
-        previousChar = char;
-        // lastChar = char;
+            previousChar = char;
+        }
     }
 
     nextLine();

@@ -3,7 +3,7 @@
   "version": "8.16.0",
   "author": "Wonder & PixiJS Team",
   "homepage": "https://github.com/aquila-lab/pixijs#readme",
-  "bugs": "https://github.com/aquila-lab/pixijs/issues"
+  "bugs": "https://github.com/aquila-lab/pixijs/issues",
   "license": "MIT",
   "repository": {
     "type": "git",

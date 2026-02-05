@@ -6,7 +6,7 @@ import { renderTest } from './tester';
 import { Assets } from '~/assets';
 import { TexturePool } from '~/rendering';
 
-import type { RenderType, RenderTypeFlags } from './types';
+import type { RenderType, RenderTypeFlags, TestScene } from './types';
 
 const sceneFilter = process.env.SCENE_FILTER;
 const globPattern = sceneFilter ? `**/${sceneFilter}` : '**/*.scene.ts';
@@ -16,7 +16,7 @@ const scenes = paths.map((p) =>
     const relativePath = path.relative('visual/', p);
 
     // eslint-disable-next-line global-require , @typescript-eslint/no-require-imports
-    return { path: p, data: require(`./${relativePath}`).scene };
+    return { path: p, data: require(`./${relativePath}`).scene as TestScene };
 });
 
 const onlyScenes = scenes.filter((s) =>
@@ -40,9 +40,11 @@ function setAssetBasePath(): void
 {
     const branchPath = process.env.GITHUB_SHA ?? 'next-v8';
 
+    const serverPort = process.env.SERVER_PORT || '8080';
+
     const basePath = process.env.GITHUB_ACTIONS
         ? `https://raw.githubusercontent.com/pixijs/pixijs/${branchPath}/tests/visual/assets/`
-        : 'http://127.0.0.1:8080/tests/visual/assets/';
+        : `http://127.0.0.1:${serverPort}/tests/visual/assets/`;
 
     Assets.init({
         basePath,
@@ -59,16 +61,28 @@ describe('Visual Tests', () =>
             webgpu: true,
             webgl1: true,
             webgl2: true,
+            canvas: true,
         };
 
         const renderers = {
             ...defaultRenderers,
-            ...scene.data.renderers,
+            ...(Array.isArray(scene.data.renderers) ? scene.data.renderers.reduce((acc, r) =>
+            {
+                acc[r] = true;
+
+                return acc;
+            }, {} as Record<RenderType, boolean>) : scene.data.renderers),
+            ...(scene.data.excludeRenderers?.reduce((acc, r) =>
+            {
+                acc[r] = false;
+
+                return acc;
+            }, {} as Record<RenderType, boolean>) ?? {}),
         };
 
         Object.keys(renderers).forEach((renderer) =>
         {
-            if (!renderers[renderer])
+            if (!renderers[renderer as RenderType])
             {
                 return;
             }

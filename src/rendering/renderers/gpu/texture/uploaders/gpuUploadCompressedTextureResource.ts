@@ -56,4 +56,3 @@ export const gpuUploadCompressedTextureResource = {
         }
     }
 } as GpuTextureUploader<CompressedSource>;
-

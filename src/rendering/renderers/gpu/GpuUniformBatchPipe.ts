@@ -51,6 +51,31 @@ export class GpuUniformBatchPipe
                 usage
             }));
         }
+
+        // When the batch buffer grows, immediately update all GPU buffer data references
+        // so that their descriptor.size reflects the new capacity before any BufferResources
+        // are created with offsets into the grown region.
+        this._batchBuffer.onResize = (data: Float32Array) =>
+        {
+            const rendererUid = this._renderer.uid;
+
+            for (let i = 0; i < this._buffers.length; i++)
+            {
+                const buffer = this._buffers[i];
+
+                // Null out the GPU data reference BEFORE setting buffer.data.
+                // Setting buffer.data with a larger array emits a 'change' event, which triggers
+                // GpuBufferSystem.onBufferChange → GCManagedHash.remove. Normally remove() would
+                // destroy the old GPUBuffer. However, the old GPUBuffer may still be referenced by
+                // bind groups already recorded in the current frame's render pass (submitted later
+                // in postrender). By nulling _gpuData first, remove() sees no GPU data and returns
+                // early — the old GPUBuffer stays alive (orphaned) for the rest of the frame.
+                // createGPUBuffer (called by onBufferChange) then creates a fresh GPUBuffer at the
+                // new size and stores it in _gpuData.
+                buffer._gpuData[rendererUid] = null;
+                buffer.data = data;
+            }
+        };
     }
 
     public renderEnd()

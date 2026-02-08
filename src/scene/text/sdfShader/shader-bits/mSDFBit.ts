@@ -22,9 +22,13 @@ export const mSDFBit = {
                 }
 
                 // Gamma correction for coverage-like alpha
+                // Note: do NOT multiply by shapeColor.a here. The shader
+                // template already applies vColor (which carries the user's
+                // alpha) via: finalColor = outColor * vColor.
+                // Including shapeColor.a here would square the alpha.
                 var luma: f32 = dot(shapeColor.rgb, vec3<f32>(0.299, 0.587, 0.114));
                 var gamma: f32 = mix(1.0, 1.0 / 2.2, luma);
-                var coverage: f32 = pow(shapeColor.a * alpha, gamma);
+                var coverage: f32 = pow(alpha, gamma);
 
                 return coverage;
 
@@ -59,9 +63,13 @@ export const mSDFBitGl = {
                 }
 
                 // Gamma correction for coverage-like alpha
+                // Note: do NOT multiply by shapeColor.a here. The shader
+                // template already applies vColor (which carries the user's
+                // alpha) via: finalColor = outColor * vColor.
+                // Including shapeColor.a here would square the alpha.
                 float luma = dot(shapeColor.rgb, vec3(0.299, 0.587, 0.114));
                 float gamma = mix(1.0, 1.0 / 2.2, luma);
-                float coverage = pow(shapeColor.a * alpha, gamma);
+                float coverage = pow(alpha, gamma);
 
                 return coverage;
             }
